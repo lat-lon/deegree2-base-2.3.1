@@ -1,4 +1,3 @@
-$Header$
 
               The deegree 2.0 OGC Web Service (OWS) implementation
               ====================================================
