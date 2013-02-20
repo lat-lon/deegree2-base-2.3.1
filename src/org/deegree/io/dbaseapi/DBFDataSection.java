@@ -48,6 +48,9 @@ package org.deegree.io.dbaseapi;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.deegree.framework.log.ILogger;
+import org.deegree.framework.log.LoggerFactory;
+
 /**
  * Class representing a record of the data section of a dBase III/IV file<BR>
  * at the moment only the daata types character ("C") and numeric ("N") are supported
@@ -60,6 +63,8 @@ import java.util.List;
  */
 public class DBFDataSection {
 
+	private static final ILogger LOG = LoggerFactory.getLogger( DBFDataSection.class );
+	
     /**
      * length of one record in bytes
      */
@@ -145,8 +150,11 @@ public class DBFDataSection {
                 } else {
                     b = ( (String) recData.get( i ) ).getBytes();
                 }
-                if ( b.length > fddata[16] )
-                    throw new DBaseException( "string contains too many characters " + (String) recData.get( i ) );
+                if ( b.length > fddata[16] ) {
+                	String substring = ( (String) recData.get( i ) ).substring( 0, fddata[16] );
+                	b = substring.getBytes();
+                	LOG.logWarning( "String contains too many characters: " + (String) recData.get( i ) + "; So it is cut to " + fddata[16] + " characters: " + substring );
+                }
                 for ( int j = 0; j < b.length; j++ )
                     datasec.data[offset + j] = b[j];
                 for ( int j = b.length; j < fddata[16]; j++ )
