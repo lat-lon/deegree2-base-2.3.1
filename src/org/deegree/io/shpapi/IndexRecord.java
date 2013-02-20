@@ -1,0 +1,119 @@
+//$HeadURL: svn+ssh://jwilden@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/io/shpapi/IndexRecord.java $
+/*----------------    FILE HEADER  ------------------------------------------
+
+ This file is part of deegree.
+ Copyright (C) 2001-2008 by:
+ EXSE, Department of Geography, University of Bonn
+ http://www.giub.uni-bonn.de/deegree/
+ lat/lon GmbH
+ http://www.lat-lon.de
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ Contact:
+
+ Andreas Poth
+ lat/lon GmbH
+ Aennchenstr. 19
+ 53115 Bonn
+ Germany
+ E-Mail: poth@lat-lon.de
+
+ Prof. Dr. Klaus Greve
+ Department of Geography
+ University of Bonn
+ Meckenheimer Allee 166
+ 53115 Bonn
+ Germany
+ E-Mail: greve@giub.uni-bonn.de
+
+ 
+ ---------------------------------------------------------------------------*/
+
+package org.deegree.io.shpapi;
+
+import org.deegree.model.spatialschema.ByteUtils;
+
+/**
+ * Class representing a record of an ESRI .shx file.
+ * 
+ * 
+ * @author <a href="mailto:poth@lat-lon.de">Andreas Poth</a>
+ * @author last edited by: $Author: apoth $
+ * 
+ * @version $Revision: 10660 $, $Date: 2008-03-24 22:39:54 +0100 (Mon, 24 Mar 2008) $
+ */
+public class IndexRecord {
+
+    protected int offset;
+
+    protected int length;
+
+    /**
+     * 
+     * 
+     */
+    public IndexRecord() {
+        this.offset = 0;
+        this.length = 0;
+    }
+
+    /**
+     * 
+     * @param off
+     * @param len
+     */
+    public IndexRecord( int off, int len ) {
+        this.offset = off;
+        this.length = len;
+    }
+
+    /**
+     * 
+     * @param recBuf
+     */
+    public IndexRecord( byte[] recBuf ) {
+        this.offset = ByteUtils.readBEInt( recBuf, 0 );
+        this.length = ByteUtils.readBEInt( recBuf, 4 );
+    }
+
+    /**
+     * 
+     * @return index record length
+     */
+    public int getLength() {
+        return length;
+    }
+
+    /**
+     * 
+     * @return index record offset
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
+     * 
+     * @return index record as byte arry
+     */
+    public byte[] writeIndexRecord() {
+        byte[] arr = new byte[8];
+        ByteUtils.writeBEInt( arr, 0, offset );
+        ByteUtils.writeBEInt( arr, 4, length );
+        return arr;
+    }
+
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Transform xmlns="http://www.opengis.net/wcts/0.0" xmlns:ows="http://www.opengis.net/ows/1.1"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:deegreewcts="http://www.deegree.org/wcts" service="WCTS"
+  version="0.4.0">
+  <!-- Shows the usage of the deegree specific inline data element and simple data-->
+  <SourceCRS>urn:ogc:def:crs:EPSG::4326</SourceCRS>
+  <TargetCRS>urn:ogc:def:crs:EPSG::28992</TargetCRS>
+  <ows:InputData>
+    <ows:ReferenceGroup>
+      <ows:Title>Very simple coordinates</ows:Title>
+      <ows:Reference />
+    </ows:ReferenceGroup>
+    <deegreewcts:InlineData>
+      <!-- Simple data is very simple, just a list of  coordinates separtated by the cs attribute, the tuples are
+        calculated from the given srsDimension (which should be equal to the dimension of the sourceCRS -->
+      <deegreewcts:SimpleData srsDimension="2" cs=",">18.2,3.8,15,4,17.9,3.1415,18.9,8</deegreewcts:SimpleData>
+    </deegreewcts:InlineData>
+  </ows:InputData>
+  <OutputFormat>text/xml; gmlVersion=3.1.1</OutputFormat>
+</Transform>

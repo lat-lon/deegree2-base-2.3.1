@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Transform xmlns="http://www.opengis.net/wcts/0.0" xmlns:ows="http://www.opengis.net/ows/1.1"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:deegreewcts="http://www.deegree.org/wcts" service="WCTS"
+  version="0.4.0">
+  <!-- Shows the usage of the deegree specific inline data element and three geometries-->
+  <SourceCRS>urn:ogc:def:crs:EPSG::4326</SourceCRS>
+  <TargetCRS>urn:ogc:def:crs:EPSG::31467</TargetCRS>
+  <ows:InputData>
+    <ows:ReferenceGroup>
+      <ows:Title>A German nonsense geometry</ows:Title>
+      <ows:Reference />
+    </ows:ReferenceGroup>
+    <deegreewcts:InlineData>
+      <!-- Geometrydata can have unbounded geometries -->
+      <deegreewcts:GeometryData>
+        <gml:Point srsName="urn:ogc:def:crs:EPSG::4326">
+          <gml:pos>-102.28969800 21.88751600</gml:pos>
+        </gml:Point>
+        <gml:Polygon srsName="EPSG:4326">
+          <gml:outerBoundaryIs>
+            <gml:LinearRing>
+              <gml:coordinates cs="," decimal="." ts=" ">
+                0.0,50.0 5.0,52.0 13.0,48.0 8.0,44.0 1.0,46.0 0.0,50.0
+              </gml:coordinates>
+            </gml:LinearRing>
+          </gml:outerBoundaryIs>
+        </gml:Polygon>
+        <gml:Surface>
+          <gml:patches>
+            <gml:PolygonPatch>
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>
+                    4.0 51.0 4.01.0 51.0 4.01 51.01 4.0 51.01 4.005 51.005 4.0 51.0
+                  </gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:PolygonPatch>
+          </gml:patches>
+        </gml:Surface>
+      </deegreewcts:GeometryData>
+    </deegreewcts:InlineData>
+  </ows:InputData>
+  <OutputFormat>text/xml; gmlVersion=3.1.1</OutputFormat>
+</Transform>

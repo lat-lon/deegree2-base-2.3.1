@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:GetRecords service="CSW" version="2.0.2" outputFormat="application/xml" outputSchema="http://www.isotc211.org/2005/gmd" resultType="RESULTS" 
+	xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" 
+	xmlns:app="http://www.deegree.org/app"
+	xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns="http://www.isotc211.org/2005/gmd" 
+	xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0">
+	<csw:Query typeNames="gmd:MD_Metadata">
+		<csw:ElementSetName>full</csw:ElementSetName>
+		<csw:Constraint version="1.1.0">
+			<ogc:Filter>
+				<ogc:BBOX>
+                    <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName>
+                    <gml:Box>
+                        <gml:coordinates>1,0 19,56</gml:coordinates>
+                    </gml:Box>
+                </ogc:BBOX> 
+			</ogc:Filter>
+		</csw:Constraint>
+	</csw:Query>
+</csw:GetRecords>
