@@ -1,2 +1,0 @@
-C:\Programme\Java\jdk1.5.0_06\bin\java -classpath .;..\..\classes;..\..\lib\xml\jaxen-1.1-beta-8.jar;..\..\lib\jts\jts-1.8.jar;..\..\lib\log4j\log4j-1.2.9.jar org.deegree.tools.shape.IndexShapeFile
-pause

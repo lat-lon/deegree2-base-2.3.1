@@ -1,3 +1,0 @@
-deegree revisions | svn repository number
------------------------------------------
-    rc-1          |       11169 
