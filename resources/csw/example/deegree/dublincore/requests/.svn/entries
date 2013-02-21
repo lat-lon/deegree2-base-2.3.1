@@ -1,0 +1,40 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/resources/csw/example/deegree/dublincore/requests
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2007-05-22T09:08:58.119643Z
+7234
+rbezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+GetCapabilities
+dir
+
+DescribeRecord
+dir
+
+GetRecords
+dir
+
+Transaction
+dir
+

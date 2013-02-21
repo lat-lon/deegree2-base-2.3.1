@@ -1,0 +1,23 @@
+CREATE TABLE WMPS_REQUESTS ( 
+	id VARCHAR(15), 
+	processed VARCHAR(10), 
+	timestamp BIGINT, 
+	version VARCHAR(10), 
+	layers BYTEA, 
+	srs VARCHAR(15), 
+	boundingbox VARCHAR(100), 
+	center VARCHAR(50), 
+	scaledenominator INTEGER, 
+	transparent BOOLEAN, 
+	bgcolor VARCHAR(10), 
+	title VARCHAR(100), 
+	copyright VARCHAR(50), 
+	legend BOOLEAN, 
+	scaleBar BOOLEAN, 
+	note VARCHAR(200), 
+	template VARCHAR(30), 
+	emailaddress VARCHAR(30), 
+	textAreas BYTEA, 
+	vendor BYTEA, 
+	PRIMARY KEY(id,timestamp) 
+);

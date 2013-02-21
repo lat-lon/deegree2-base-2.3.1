@@ -1,0 +1,24 @@
+K 10
+svn:ignore
+V 729
+!Configuration.csw.capabilities.generated!
+DescribeRecordKVPExample1_result.xml
+DescribeRecordKVPExample2_result.xml
+DescribeRecordXMLDescribeDataset_result.xml
+GetCapabilitiesKVPExample1_result.xml
+GetCapabilitiesXMLSimple_result.xml
+GetCapabilitiesXMLWithParameters_result.xml
+GetRecordsKVPExample1_result.xml
+GetRecordsKVPExample2_result.xml
+GetRecordsXMLAll_result.xml
+GetRecordsXMLContains_result.xml
+GetRecordsXMLId_result.xml
+GetRecordsXMLPropertyIsEqualToBrief_result.xml
+GetRecordsXMLPropertyIsEqualToFull_result.xml
+GetRecordsXMLPropertyIsEqualToSummary_result.xml
+GetRecordsXMLPropertyIsEqualToSummary2_result.xml
+GetRecordsXMLPropertyIsLike_result.xml
+TransactionXMLComplex_result.xml
+TransactionXMLInsert_result.xml
+
+END

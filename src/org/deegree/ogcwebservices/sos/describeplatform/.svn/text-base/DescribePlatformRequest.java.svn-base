@@ -1,0 +1,229 @@
+//$HeadURL$
+/*----------------    FILE HEADER  ------------------------------------------
+
+ This file is part of deegree.
+ Copyright (C) 2001-2008 by:
+ EXSE, Department of Geography, University of Bonn
+ http://www.giub.uni-bonn.de/deegree/
+ lat/lon GmbH
+ http://www.lat-lon.de
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ Contact:
+
+ Andreas Poth
+ lat/lon GmbH
+ Aennchenstraße 19  
+ 53177 Bonn
+ Germany
+ E-Mail: poth@lat-lon.de
+
+ Prof. Dr. Klaus Greve
+ lat/lon GmbH
+ Aennchenstraße 19
+ 53177 Bonn
+ Germany
+ E-Mail: greve@giub.uni-bonn.de
+
+ ---------------------------------------------------------------------------*/
+package org.deegree.ogcwebservices.sos.describeplatform;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.deegree.framework.log.ILogger;
+import org.deegree.framework.log.LoggerFactory;
+import org.deegree.framework.util.StringTools;
+import org.deegree.framework.xml.NamespaceContext;
+import org.deegree.framework.xml.XMLTools;
+import org.deegree.ogcbase.CommonNamespaces;
+import org.deegree.ogcwebservices.AbstractOGCWebServiceRequest;
+import org.deegree.ogcwebservices.OGCWebServiceException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+/**
+ * 
+ * represent a DescribePlatformRequest
+ * 
+ * @author <a href="mailto:mkulbe@lat-lon.de">Matthias Kulbe </a>
+ * @author last edited by: $Author$
+ * 
+ * @version $Revision$, $Date$
+ */
+
+public class DescribePlatformRequest extends AbstractOGCWebServiceRequest {
+
+    private static final long serialVersionUID = -1058662854500930886L;
+
+    private static final NamespaceContext nsContext = CommonNamespaces.getNamespaceContext();
+
+    private static final ILogger LOG = LoggerFactory.getLogger( DescribePlatformRequest.class );
+
+    private String[] typeNames = null;
+
+    private String outputFormat = null;
+
+    /**
+     * 
+     * creates a DescribePlatform Request from a KVP Map
+     * 
+     * @param map
+     * @return the new request
+     * @throws OGCWebServiceException
+     * 
+     */
+    public static DescribePlatformRequest create( Map<String, String> map )
+                            throws OGCWebServiceException {
+
+        // added by deegree
+        String id = map.get( "ID" );
+
+        // optional Parameter
+        String version = map.get( "VERSION" );
+
+        // optional Parameter, fixed to "SOS"
+        String service = map.get( "SERVICE" );
+        if ( ( service != null ) && ( !service.equals( "SOS" ) ) ) {
+            throw new OGCWebServiceException( "service must be 'SOS'" );
+        }
+
+        // optional Parameter, fixed to "SensorML"
+        String outputFormat = map.get( "OUTPUTFORMAT" );
+        if ( ( outputFormat != null ) && ( !outputFormat.equals( "SensorML" ) ) ) {
+            throw new OGCWebServiceException( "outputFormat must be 'SensorML'" );
+        }
+
+        // optional and unbounded
+        String[] typeNames = null;
+        if ( map.get( "TYPENAMES" ) != null ) {
+            String tmp = map.get( "TYPENAMES" );
+            typeNames = StringTools.toArray( tmp, ",", false );
+        }
+
+        return new DescribePlatformRequest( typeNames, "SensorML", version, id, null );
+
+    }
+
+    /**
+     * creates a DescribePlatform Request from a XML Document
+     * 
+     * @param id
+     * @param doc
+     * @return the new request
+     * @throws OGCWebServiceException
+     * 
+     */
+    public static DescribePlatformRequest create( String id, Document doc )
+                            throws OGCWebServiceException {
+
+        try {
+            // optional Parameter
+            String version = XMLTools.getNodeAsString( doc, "/sos:DescribePlatform/@version", nsContext, null );
+
+            // optional Parameter, fixed to "SCS"
+            String service = XMLTools.getNodeAsString( doc, "/sos:DescribePlatform/@service", nsContext, null );
+            if ( ( service != null ) && ( !service.equals( "SOS" ) ) ) {
+                throw new OGCWebServiceException( "service must be 'SOS'" );
+            }
+
+            // optional Parameter, fixed to "SensorML"
+            String outputFormat = XMLTools.getNodeAsString( doc, "/sos:DescribePlatform/@outputFormat", nsContext, null );
+            if ( ( outputFormat != null ) && ( !outputFormat.equals( "SensorML" ) ) ) {
+                throw new OGCWebServiceException( "outputFormat must be 'SensorML'" );
+            }
+
+            // optional and unbounded
+            ArrayList<String> al = new ArrayList<String>();
+            List<Node> nl = XMLTools.getNodes( doc, "/sos:DescribePlatform/sos:TypeName", nsContext );
+            for ( int i = 0; i < nl.size(); i++ ) {
+                al.add( XMLTools.getRequiredNodeAsString( nl.get( i ), "text()", nsContext ) );
+            }
+
+            String[] types = al.toArray( new String[al.size()] );
+
+            return new DescribePlatformRequest( types, "SensorML", version, id, null );
+
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            throw new OGCWebServiceException( "scs webservice failure" );
+        }
+
+    }
+
+    /**
+     * @param id
+     * @param version
+     * @param outputFormat
+     * @param typeNames
+     * 
+     */
+    public static void create( String id, String version, String outputFormat, String[] typeNames ) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 
+     * @param typeNames
+     * @param outputFormat
+     * @param version
+     * @param id
+     * @param vendorSpecificParameter
+     */
+    private DescribePlatformRequest( String[] typeNames, String outputFormat, String version, String id,
+                                     Map<String, String> vendorSpecificParameter ) {
+
+        super( version, id, vendorSpecificParameter );
+
+        this.typeNames = typeNames;
+        this.outputFormat = outputFormat;
+
+        StringBuffer sb = new StringBuffer( 200 );
+        sb.append( "create DescribePlatformRequest: service= SCS" );
+        sb.append( " version=" ).append( version ).append( " outputFormat=" );
+        sb.append( outputFormat ).append( " id=" ).append( id );
+        sb.append( " NumberOfTypeNames=" ).append( typeNames.length );
+        LOG.logDebug( sb.toString() );
+
+    }
+
+    /**
+     * fixed 'SOS'
+     * 
+     * @return the String "SOS"
+     */
+    public String getServiceName() {
+        return "SOS";
+    }
+
+    /**
+     * @return typeNames
+     */
+    public String[] getTypeNames() {
+        return typeNames;
+    }
+
+    /**
+     * returns the desired output format name
+     * 
+     * @return desired output format name
+     */
+    public String getOutputFormat() {
+        return outputFormat;
+    }
+
+}

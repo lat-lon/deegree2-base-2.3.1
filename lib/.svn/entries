@@ -1,0 +1,91 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/lib
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-21T13:46:25.206868Z
+15020
+mschneider
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+jts
+dir
+
+xml
+dir
+
+soap
+dir
+
+jai
+dir
+
+jetspeed
+dir
+
+acme
+dir
+
+visad
+dir
+
+java3d
+dir
+
+commons
+dir
+
+jfreechart
+dir
+
+hsqldb
+dir
+
+ecw
+dir
+
+log4j
+dir
+
+j3d
+dir
+
+ehcache
+dir
+
+mail
+dir
+
+servlet
+dir
+
+jasper
+dir
+
+postgis
+dir
+
+junit
+dir
+
+batik
+dir
+

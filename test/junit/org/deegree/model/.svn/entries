@@ -1,0 +1,43 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/test/junit/org/deegree/model
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-07-16T17:54:52.133705Z
+13015
+mschneider
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+feature
+dir
+
+filterencoding
+dir
+
+spatialschema
+dir
+
+crs
+dir
+
+table
+dir
+

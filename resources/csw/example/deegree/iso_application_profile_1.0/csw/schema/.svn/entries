@@ -1,0 +1,80 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/resources/csw/example/deegree/iso_application_profile_1.0/csw/schema
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-04-07T08:36:04.670738Z
+10929
+lbuesching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+gml
+dir
+
+filter
+dir
+
+xlink
+dir
+
+ows
+dir
+
+dc_dataset.xsd
+file
+
+
+
+
+2013-02-21T14:23:31.951509Z
+ae7d1f94db2ba0942ed069be54972777
+2008-04-07T08:36:04.670738Z
+10929
+lbuesching
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3632
+
+iso
+dir
+
+csw
+dir
+

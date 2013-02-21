@@ -1,0 +1,40 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/scripts
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-25T15:59:10.526386Z
+15101
+aschmitz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+shell
+dir
+
+xslt
+dir
+
+sql
+dir
+
+batch
+dir
+

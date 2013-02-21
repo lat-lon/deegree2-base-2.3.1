@@ -1,0 +1,40 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/test/junit/org/deegree/framework
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-06-05T07:16:10.871844Z
+12177
+aschmitz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+util
+dir
+
+xml
+dir
+
+log
+dir
+
+concurrent
+dir
+

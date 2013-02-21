@@ -1,0 +1,40 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/resources/wass/was/example/deegree/requests
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2007-03-20T09:15:15.932878Z
+6259
+bezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+CloseSession
+dir
+
+GetCapabilities
+dir
+
+GetSAMLResponse
+dir
+
+GetSession
+dir
+

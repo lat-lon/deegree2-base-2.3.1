@@ -1,0 +1,43 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/test/junit/org/deegree/crs
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-20T16:19:57.104691Z
+14995
+rbezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+components
+dir
+
+configuration
+dir
+
+transformations
+dir
+
+coordinatesystems
+dir
+
+projections
+dir
+

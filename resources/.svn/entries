@@ -1,0 +1,94 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/resources
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-26T14:58:34.862156Z
+15119
+rbezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+gml
+dir
+
+wcts
+dir
+
+ehcache
+dir
+
+sld
+dir
+
+eclipse
+dir
+
+filter
+dir
+
+wmps
+dir
+
+crs
+dir
+
+csw
+dir
+
+wcs
+dir
+
+wfs
+dir
+
+wpvs
+dir
+
+xml
+dir
+
+arc2iso
+dir
+
+trigger
+dir
+
+sos
+dir
+
+igeoportal
+dir
+
+wms
+dir
+
+citygml
+dir
+
+wps
+dir
+
+owsproxy
+dir
+
+wass
+dir
+

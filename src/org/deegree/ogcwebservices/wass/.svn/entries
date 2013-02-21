@@ -1,0 +1,43 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/ogcwebservices/wass
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-03-06T16:42:41.608302Z
+10503
+aschmitz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+was
+dir
+
+saml
+dir
+
+wss
+dir
+
+exceptions
+dir
+
+common
+dir
+

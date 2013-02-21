@@ -1,0 +1,80 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/portal/standard
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-26T15:18:29.339531Z
+15129
+aschmitz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+context
+dir
+
+sos
+dir
+
+wms
+dir
+
+security
+dir
+
+csw
+dir
+
+wfs
+dir
+
+PortalRequestDispatcher.java
+file
+
+
+
+
+2013-02-21T14:23:11.767508Z
+8659da2d8c2fe45db6e5ddc79ac47db6
+2008-06-06T14:25:39.267664Z
+12214
+jmays
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5730
+

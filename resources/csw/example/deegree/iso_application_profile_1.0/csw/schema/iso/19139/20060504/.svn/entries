@@ -1,0 +1,123 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/resources/csw/example/deegree/iso_application_profile_1.0/csw/schema/iso/19139/20060504
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-04-07T08:36:04.670738Z
+10929
+lbuesching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+resources
+dir
+
+srv
+dir
+
+gmx
+dir
+
+gsr
+dir
+
+ReadMe.txt
+file
+
+
+
+
+2013-02-21T14:23:31.307509Z
+3432e897a4a61f1550603f78e3ba07d0
+2008-04-07T08:36:04.670738Z
+10929
+lbuesching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+895
+
+gss
+dir
+
+gts
+dir
+
+gml
+dir
+
+Version.txt
+file
+
+
+
+
+2013-02-21T14:23:31.307509Z
+d4a123f69c102916e284b1a1af08c93d
+2008-04-07T08:36:04.670738Z
+10929
+lbuesching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+135
+
+gmd
+dir
+
+gco
+dir
+

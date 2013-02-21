@@ -1,0 +1,213 @@
+//$HeadURL: svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/ogcwebservices/sos/describesensor/DescribeSensorRequest.java $
+/*----------------    FILE HEADER  ------------------------------------------
+
+ This file is part of deegree.
+ Copyright (C) 2001-2008 by:
+ EXSE, Department of Geography, University of Bonn
+ http://www.giub.uni-bonn.de/deegree/
+ lat/lon GmbH
+ http://www.lat-lon.de
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ Contact:
+
+ Andreas Poth
+ lat/lon GmbH
+ Aennchenstraße 19  
+ 53177 Bonn
+ Germany
+ E-Mail: poth@lat-lon.de
+
+ Prof. Dr. Klaus Greve
+ lat/lon GmbH
+ Aennchenstraße 19
+ 53177 Bonn
+ Germany
+ E-Mail: greve@giub.uni-bonn.de
+
+ ---------------------------------------------------------------------------*/
+package org.deegree.ogcwebservices.sos.describesensor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.deegree.framework.util.StringTools;
+import org.deegree.framework.xml.NamespaceContext;
+import org.deegree.framework.xml.XMLTools;
+import org.deegree.ogcbase.CommonNamespaces;
+import org.deegree.ogcwebservices.AbstractOGCWebServiceRequest;
+import org.deegree.ogcwebservices.OGCWebServiceException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+/**
+ * 
+ * represents a DescribeSensor Request
+ * 
+ * @author <a href="mailto:mkulbe@lat-lon.de">Matthias Kulbe </a>
+ * @author last edited by: $Author: aschmitz $
+ * 
+ * @version $Revision: 11651 $, $Date: 2008-05-08 15:37:24 +0200 (Do, 08. Mai 2008) $
+ */
+public class DescribeSensorRequest extends AbstractOGCWebServiceRequest {
+
+    private static final long serialVersionUID = -5073240463354913490L;
+
+    private static final NamespaceContext nsContext = CommonNamespaces.getNamespaceContext();
+
+    private String[] typeNames = null;
+
+    private String outputFormat = null;
+
+    /**
+     * 
+     * creates the Request by using a KVP Map
+     * 
+     * @param map
+     * @return the bean
+     * @throws OGCWebServiceException
+     */
+    public static DescribeSensorRequest create( Map<String, String> map )
+                            throws OGCWebServiceException {
+
+        // id was set by deegree
+        String id = map.get( "ID" );
+
+        // optional Parameter
+        String version = map.get( "VERSION" );
+
+        // optional Parameter, is fixed to "SOS"
+        String service = map.get( "SERVICE" );
+        if ( ( service != null ) && ( !service.equals( "SOS" ) ) ) {
+            throw new OGCWebServiceException( "service must be 'SOS'" );
+        }
+
+        // optional Parameter, is fixed to "SensorML"
+        String outputFormat = map.get( "OUTPUTFORMAT" );
+        if ( ( outputFormat != null ) && ( !outputFormat.equals( "SensorML" ) ) ) {
+            throw new OGCWebServiceException( "outputFormat must be 'SensorML'" );
+        }
+
+        // optional and unbounded
+        String[] typeNames = null;
+        if ( map.get( "TYPENAMES" ) != null ) {
+            String tmp = map.get( "TYPENAMES" );
+            typeNames = StringTools.toArray( tmp, ",", false );
+        }
+
+        return new DescribeSensorRequest( typeNames, "SensorML", version, id, null );
+
+    }
+
+    /**
+     * creates the Request by using a XML Document
+     * 
+     * @param id
+     * @param doc
+     * @return the bean
+     * @throws OGCWebServiceException
+     * 
+     */
+    public static DescribeSensorRequest create( String id, Document doc )
+                            throws OGCWebServiceException {
+
+        try {
+            // optional Prameter
+            String version = XMLTools.getNodeAsString( doc, "/sos:DescribeSensor/@version", nsContext, null );
+
+            // optional Parameter, is fixed to "SCS"
+            String service = XMLTools.getNodeAsString( doc, "/sos:DescribeSensor/@service", nsContext, null );
+            if ( ( service != null ) && ( !service.equals( "SOS" ) ) ) {
+                throw new OGCWebServiceException( "service must be 'SOS'" );
+            }
+
+            // optional Parameter, is fixed to "SensorML"
+            String outputFormat = XMLTools.getNodeAsString( doc, "/sos:DescribeSensor/@outputFormat", nsContext, null );
+            if ( ( outputFormat != null ) && ( !outputFormat.equals( "SensorML" ) ) ) {
+                throw new OGCWebServiceException( "outputFormat must be 'SensorML'" );
+            }
+
+            // optional and unbounded
+            List<Node> nl = XMLTools.getNodes( doc, "/sos:DescribeSensor/sos:TypeName", nsContext );
+            ArrayList<String> al = new ArrayList<String>( nl.size() );
+            for ( int i = 0; i < nl.size(); i++ ) {
+                al.add( XMLTools.getRequiredNodeAsString( nl.get( i ), "text()", nsContext ) );
+            }
+
+            return new DescribeSensorRequest( al.toArray( new String[al.size()] ), "SensorML", version, id, null );
+
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            throw new OGCWebServiceException( "scs webservice failure" );
+        }
+
+    }
+
+    /**
+     * @param id
+     * @param version
+     * @param outputFormat
+     * @param typeNames
+     * 
+     */
+    public static void create( String id, String version, String outputFormat, String[] typeNames ) {
+        throw new UnsupportedOperationException( "create( String , String , String , String[] ) not implemented" );
+    }
+
+    /**
+     * @param typeNames
+     * @param outputFormat
+     * @param version
+     * @param id
+     * 
+     */
+    private DescribeSensorRequest( String[] typeNames, String outputFormat, String version, String id,
+                                   Map<String, String> vendorSpecificParameter ) {
+
+        super( version, id, vendorSpecificParameter );
+
+        this.typeNames = typeNames;
+        this.outputFormat = outputFormat;
+
+    }
+
+    /**
+     * fixed 'SOS'
+     * 
+     * @return the String "SOS".
+     */
+    public String getServiceName() {
+        return "SOS";
+    }
+
+    /**
+     * 
+     * @return typeNames
+     */
+    public String[] getTypeNames() {
+        return typeNames;
+    }
+
+    /**
+     * 
+     * @return outputFormat
+     */
+    public String getOutputFormat() {
+        return outputFormat;
+    }
+
+}

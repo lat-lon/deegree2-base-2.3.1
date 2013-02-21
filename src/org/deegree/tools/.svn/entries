@@ -1,0 +1,58 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/tools
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-20T16:06:18.774306Z
+14987
+rbezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+legend
+dir
+
+raster
+dir
+
+shape
+dir
+
+xml
+dir
+
+importer
+dir
+
+datastore
+dir
+
+wms
+dir
+
+app3d
+dir
+
+security
+dir
+
+srs
+dir
+

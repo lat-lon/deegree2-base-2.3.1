@@ -1,0 +1,37 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/resources/csw/example/deegree/iso_application_profile_0.9/requests
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2007-12-13T10:56:50.089298Z
+9154
+lbuesching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+GetRecords
+dir
+
+Transaction
+dir
+
+GetRecordById
+dir
+

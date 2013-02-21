@@ -1,0 +1,165 @@
+//$HeadURL: svn+ssh://developername@svn.wald.intevation.org/deegree/base/trunk/src/org/deegree/ogcwebservices/wms/configuration/DatabaseDataSource.java $
+/*----------------    FILE HEADER  ------------------------------------------
+
+ This file is part of deegree.
+ Copyright (C) 2001-2008 by:
+ EXSE, Department of Geography, University of Bonn
+ http://www.giub.uni-bonn.de/deegree/
+ lat/lon GmbH
+ http://www.lat-lon.de
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ Contact:
+
+ Andreas Poth
+ lat/lon GmbH
+ Aennchenstraße 19
+ 53177 Bonn
+ Germany
+ E-Mail: poth@lat-lon.de
+
+ Prof. Dr. Klaus Greve
+ Department of Geography
+ University of Bonn
+ Meckenheimer Allee 166
+ 53115 Bonn
+ Germany
+ E-Mail: greve@giub.uni-bonn.de
+
+ ---------------------------------------------------------------------------*/
+package org.deegree.ogcwebservices.wms.configuration;
+
+import org.deegree.datatypes.QualifiedName;
+import org.deegree.io.JDBCConnection;
+import org.deegree.model.crs.CoordinateSystem;
+import org.deegree.model.spatialschema.Geometry;
+import org.deegree.ogcwebservices.OGCWebService;
+import org.deegree.ogcwebservices.OGCWebServiceException;
+import org.deegree.ogcwebservices.wms.capabilities.ScaleHint;
+
+/**
+ * 
+ * 
+ * 
+ * @author <a href="mailto:poth@lat-lon.de">Andreas Poth</a>
+ * @author last edited by: $Author: poth $
+ * 
+ * @version $Revision: 6251 $, $Date: 2007-03-19 16:59:28 +0100 (Mo, 19 Mrz 2007) $
+ */
+public class DatabaseDataSource extends AbstractDataSource {
+
+    private JDBCConnection jdbc;
+
+    private String sqlTemplate;
+
+    private String geomeryField;
+
+    private CoordinateSystem nativeCRS;
+
+    private final boolean customSQL;
+
+    /**
+     * 
+     * @param queryable
+     * @param failOnException
+     * @param name
+     * @param scaleHint
+     * @param validArea
+     * @param reqTimeLimit
+     * @param jdbc
+     * @param sqlTemplate
+     * @param geomeryField
+     * @param nativeCRS
+     */
+    public DatabaseDataSource( boolean queryable, boolean failOnException, QualifiedName name, ScaleHint scaleHint,
+                               Geometry validArea, int reqTimeLimit, JDBCConnection jdbc, String sqlTemplate,
+                               String geomeryField, CoordinateSystem nativeCRS ) {
+        this( queryable, failOnException, name, scaleHint, validArea, reqTimeLimit, jdbc, sqlTemplate, geomeryField,
+              nativeCRS, false );
+    }
+
+    /**
+     * @param queryable
+     * @param failOnException
+     * @param name
+     * @param scaleHint
+     * @param validArea
+     * @param reqTimeLimit
+     * @param jdbc
+     * @param sqlTemplate
+     * @param geomeryField
+     * @param nativeCRS
+     * @param customSQL
+     */
+    public DatabaseDataSource( boolean queryable, boolean failOnException, QualifiedName name, ScaleHint scaleHint,
+                               Geometry validArea, int reqTimeLimit, JDBCConnection jdbc, String sqlTemplate,
+                               String geomeryField, CoordinateSystem nativeCRS, boolean customSQL ) {
+        super( queryable, failOnException, name, DATABASE, null, null, scaleHint, validArea, null, reqTimeLimit );
+        this.jdbc = jdbc;
+        this.sqlTemplate = sqlTemplate;
+        this.geomeryField = geomeryField;
+        this.nativeCRS = nativeCRS;
+        this.customSQL = customSQL;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.deegree.ogcwebservices.wms.configuration.AbstractDataSource#getOGCWebService()
+     */
+    @Override
+    public OGCWebService getOGCWebService()
+                            throws OGCWebServiceException {
+        return null;
+    }
+
+    /**
+     * 
+     * @return database connection description
+     */
+    public JDBCConnection getJDBCConnection() {
+        return jdbc;
+    }
+
+    /**
+     * @return the geomeryField
+     */
+    public String getGeometryFieldName() {
+        return geomeryField;
+    }
+
+    /**
+     * @return the sqlTemplate
+     */
+    public String getSqlTemplate() {
+        return sqlTemplate;
+    }
+
+    /**
+     * @return the nativeCRS
+     */
+    public CoordinateSystem getNativeCRS() {
+        return nativeCRS;
+    }
+
+    /**
+     * @return true, if sending custom SQL templates is allowed
+     */
+    public boolean isCustomSQLAllowed() {
+        return customSQL;
+    }
+
+}

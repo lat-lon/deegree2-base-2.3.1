@@ -1,0 +1,67 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/test/junit/org/deegree
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-20T16:19:57.104691Z
+14995
+rbezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+crs
+dir
+
+io
+dir
+
+security
+dir
+
+ogcwebservices
+dir
+
+processing
+dir
+
+framework
+dir
+
+i18n
+dir
+
+test
+dir
+
+enterprise
+dir
+
+graphics
+dir
+
+model
+dir
+
+portal
+dir
+
+ogcbase
+dir
+

@@ -1,0 +1,4 @@
+#$HeadURL$
+# properties file for all map listener
+# currently only scale swticher uses this
+ScaleSwitcher.pixelSize=0.00028

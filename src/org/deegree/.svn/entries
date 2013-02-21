@@ -1,0 +1,79 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-26T15:54:33.900105Z
+15131
+aschmitz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+owscommon_new
+dir
+
+framework
+dir
+
+datatypes
+dir
+
+owscommon_1_1_0
+dir
+
+model
+dir
+
+graphics
+dir
+
+tools
+dir
+
+portal
+dir
+
+ogcbase
+dir
+
+io
+dir
+
+security
+dir
+
+ogcwebservices
+dir
+
+processing
+dir
+
+i18n
+dir
+
+enterprise
+dir
+
+owscommon
+dir
+
+crs
+dir
+

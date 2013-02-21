@@ -1,0 +1,52 @@
+10
+
+dir
+15131
+svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/model
+svn+ssh://aerben@scm.wald.intevation.org/deegree
+
+
+
+2008-11-26T15:04:39.655078Z
+15126
+rbezema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20a5a20e-76a8-4a5e-adb6-8db71fc8bde4
+
+crs
+dir
+
+table
+dir
+
+coverage
+dir
+
+feature
+dir
+
+filterencoding
+dir
+
+spatialschema
+dir
+
+metadata
+dir
+
+gridprocessing
+dir
+

@@ -1,0 +1,1 @@
+http://127.0.0.1:8080/deegreewmps/ogcwebservice?SERVICE=WMPS&VERSION=1.1.0&REQUEST=PrintMap&LAYERS=stadtbezirke&STYLES=&SRS=EPSG:31466&BBOX=2570000,5668000,2593000,5691000&TRANSPARENT=true&BGCOLOR=#FFFFFF&TITLE=lat/lon gesellschaft&LEGEND=true&SCALEBAR=false&TEMPLATE=default&EMAILADDRESS=deshmukh@lat-lon.de

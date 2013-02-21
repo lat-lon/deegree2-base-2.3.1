@@ -1,0 +1,96 @@
+//$HeadURL: svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/ogcwebservices/wpvs/operation/WPVSRequestBase.java $
+/*----------------    FILE HEADER  ------------------------------------------
+
+ This file is part of deegree.
+ Copyright (C) 2001-2008 by:
+ EXSE, Department of Geography, University of Bonn
+ http://www.giub.uni-bonn.de/deegree/
+ lat/lon GmbH
+ http://www.lat-lon.de
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ Contact:
+
+ Andreas Poth
+ lat/lon GmbH
+ Aennchenstraße 19
+ 53177 Bonn
+ Germany
+ E-Mail: poth@lat-lon.de
+
+ Prof. Dr. Klaus Greve
+ Department of Geography
+ University of Bonn
+ Meckenheimer Allee 166
+ 53115 Bonn
+ Germany
+ E-Mail: greve@giub.uni-bonn.de
+ 
+ ---------------------------------------------------------------------------*/
+
+package org.deegree.ogcwebservices.wpvs.operation;
+
+import java.util.Map;
+
+import org.deegree.ogcwebservices.AbstractOGCWebServiceRequest;
+
+/**
+ * Conveniece class for all WPVS requests (with the exception of GetCapabilities), for the moment
+ * only the GetViewRequest is supported but it might necessary to implement the GetDescription
+ * operation for this purpose this class is Abstract.
+ * 
+ * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
+ * @author last edited by: $Author: apoth $
+ * 
+ * @version $Revision: 9345 $, $Date: 2007-12-27 17:22:25 +0100 (Do, 27. Dez 2007) $
+ * 
+ */
+abstract class WPVSRequestBase extends AbstractOGCWebServiceRequest {
+
+    /**
+     * Default for <code>WPVSRequestBase</code>s.
+     * 
+     * @param version
+     *            the service vrsion
+     * @param id
+     *            the servce id
+     * @param vendorSpecificParameter
+     *            a <code>Map</code> containing vendor-specifc parameters
+     */
+    public WPVSRequestBase( String version, String id, Map<String, String> vendorSpecificParameter ) {
+        super( version, id, vendorSpecificParameter );
+    }
+
+    /**
+     * returns 'WPVS' as service name.
+     */
+    public String getServiceName() {
+        return "WPVS";
+    }
+    
+    /**
+     * @return the requested SCALE, which is a vendorspecific propertie.
+     */
+    public double getScale(){
+       String tmpScale =  getVendorSpecificParameter("SCALE");
+       double scale = 1;
+       if( tmpScale!= null ){
+           //no try catch needed, is checked in the GetView.
+           scale = Double.parseDouble(tmpScale);
+       }
+       return scale;
+    }
+}

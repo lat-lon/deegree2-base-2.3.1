@@ -1,0 +1,57 @@
+<!--
+   Ant build file for deegree.
+   Global properties. Edit this file ONLY to apply new properties
+   $Workfile: global.xml $, $Author: rbezema $
+   $Revision: 14796 $, $Date: 2008-11-10 10:35:11 +0100 (Mo, 10. Nov 2008) $
+ -->
+
+ <!--
+   set global properties for this build
+   it's recommended to keep these definitions
+ -->
+  <property name="app.name"       value="deegree2" />
+  <property name="src"            value="${basedir}/src" />
+  <property name="build"          value="${basedir}/classes" />
+  <property name="dist"           value="${basedir}/dist" />
+  <property name="dist.lib"       value="${dist}/lib" />
+  <property name="lib.jar"        value="${app.name}.jar" />
+  <property name="lib"            value="lib" />
+  <!-- Uncomment following property and below in the path declaration if you would like to add another lib directory -->
+  <!--property name="optional.libs"  value="/path/to/optional_libs"/-->
+  <property name="doc.base"       value="${basedir}/docs" />
+  <property name="doc"            value="${doc.base}/api" />
+  <property name="version.props"  value="${src}/org/deegree/framework/version/version.properties"/>
+  <property name="buildId.props"  value="${src}/org/deegree/framework/version/buildId.properties"/>
+
+  <!-- all properties are read from the build.properties file -->
+  <property file="build.properties"/>
+
+  <!-- version + buildId properties -->
+  <property file="${version.props}"/>  
+  <property file="${buildId.props}"/>
+
+  <!-- set build classpath -->
+  <path id="build.path">
+    <fileset dir="${lib}" >
+      <include name="**/*.jar" />
+    </fileset>
+    <!-- fileset dir="${optional.libs}" >
+      <include name="**/*.jar" />
+    </fileset-->
+  </path>
+
+  <!-- set dependency classpath -->
+  <path id="dependency.path">
+    <fileset dir="${lib}" >
+      <include name="**/*.jar" />
+      <exclude name="${exclude.dependency.jars}"/>  
+    </fileset>
+  </path>
+  
+  
+  <!-- ant contrib optional task def -->
+  <taskdef resource="net/sf/antcontrib/antlib.xml">
+    <classpath>
+      <pathelement location="${ant.home}/lib/ant-contrib.jar" />
+    </classpath>
+  </taskdef>

@@ -1,0 +1,40 @@
+//$HeadURL: svn+ssh://aerben@scm.wald.intevation.org/deegree/base/trunk/src/org/deegree/model/coverage/PointOutsideCoverageException.java $
+/* ----------------------------------------
+   no header
+   ---------------------------------------- */
+
+package org.deegree.model.coverage;
+
+/**
+ * Thrown when a <code>org.opengis.coverage.Coverage.evaluate</code> method is invoked with a
+ * point outside coverage.
+ *
+ * @UML exception CV_PointOutsideCoverage
+ * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
+ * @version <A HREF="http://www.opengis.org/docs/01-004.pdf">Grid Coverage specification 1.0</A>
+ *
+ */
+public class PointOutsideCoverageException extends CannotEvaluateException {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -8718412090539227101L;
+
+    /**
+     * Creates an exception with no message.
+     */
+    public PointOutsideCoverageException() {
+        super();
+    }
+
+    /**
+     * Creates an exception with the specified message.
+     *
+     * @param message
+     *            The detail message. The detail message is saved for later retrieval by the
+     *            {@link #getMessage()} method.
+     */
+    public PointOutsideCoverageException( String message ) {
+        super( message );
+    }
+}
