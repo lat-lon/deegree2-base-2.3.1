@@ -46,12 +46,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.deegree.framework.log.ILogger;
 import org.deegree.framework.log.LoggerFactory;
+import org.deegree.io.dbaseapi.DBaseException;
 import org.deegree.io.dbaseapi.DBaseFile;
 import org.deegree.model.crs.CoordinateSystem;
+import org.deegree.model.feature.Feature;
 import org.deegree.model.spatialschema.ByteUtils;
 
 /**
@@ -67,7 +70,7 @@ public class ShapeFileReader {
     private static final ILogger LOG = LoggerFactory.getLogger( ShapeFileReader.class );
 
     private String baseName;
-    
+
     private CoordinateSystem defaultCRS;
 
     private int shapeType;
@@ -82,23 +85,23 @@ public class ShapeFileReader {
      * @param baseName
      */
     public ShapeFileReader( String baseName ) {
-        if( baseName.endsWith( ".shp" ) ){
+        if ( baseName.endsWith( ".shp" ) ) {
             baseName = baseName.substring( 0, baseName.length() - 4 );
         }
         this.baseName = baseName;
     }
-    
+
     /**
      * Does not read it yet - just initializes the object.
      * 
      * @param baseName
-     * @param defaultCRS CoordinateSystem for the shape file
+     * @param defaultCRS
+     *            CoordinateSystem for the shape file
      */
     public ShapeFileReader( String baseName, CoordinateSystem defaultCRS ) {
         this( baseName );
         this.defaultCRS = defaultCRS;
     }
-    
 
     private void readHeader( InputStream in )
                             throws IOException {
@@ -126,7 +129,8 @@ public class ShapeFileReader {
         envelope = new ShapeEnvelope( false, false );
         envelope.read( header, 36 );
 
-        // it shouldn't hurt to write these values as doubles default to 0.0 anyway
+        // it shouldn't hurt to write these values as doubles default to 0.0
+        // anyway
         double zmin = ByteUtils.readLEDouble( header, 68 );
         double zmax = ByteUtils.readLEDouble( header, 76 );
         double mmin = ByteUtils.readLEDouble( header, 84 );
@@ -226,9 +230,9 @@ public class ShapeFileReader {
                 int alen = s.read( bytes, offset ) - offset;
 
                 if ( len != alen ) {
-                    LOG.logWarning( "Length is supposedly " + len + ", actual read length was "
-                                    + alen );
-                    // broken files that omit the M-section and that add the record length to the
+                    LOG.logWarning( "Length is supposedly " + len + ", actual read length was " + alen );
+                    // broken files that omit the M-section and that add the
+                    // record length to the
                     // length header:
                     offset += len - 8;
                 } else {
@@ -245,6 +249,94 @@ public class ShapeFileReader {
         LOG.logInfo( "Read " + shapes.size() + " shapes in total." );
 
         return shapes;
+    }
+
+    private Iterator<Shape> iterateShapes( final InputStream in, boolean strict )
+                            throws IOException {
+        final class Counter {
+            int offset = 0;
+        }
+        final Counter counter = new Counter();
+
+        return new Iterator<Shape>() {
+            @Override
+            public boolean hasNext() {
+                return counter.offset < ( length - 100 );
+            }
+
+            @Override
+            public Shape next() {
+                try {
+                    byte[] bytes = new byte[4];
+
+                    in.skip( 4 ); // ignore the record number
+                    in.read( bytes, 0, 4 );
+
+                    int len = ByteUtils.readBEInt( bytes, 0 ) * 2;
+                    counter.offset += 8;
+                    counter.offset += len;
+                    bytes = new byte[len];
+                    in.read( bytes );
+
+                    Shape s = null;
+                    switch ( shapeType ) {
+                    case ShapeFile.NULL:
+                        break;
+                    case ShapeFile.POINT:
+                        s = new ShapePoint( false, false, defaultCRS );
+                        break;
+                    case ShapeFile.POINTM:
+                        s = new ShapePoint( false, true, defaultCRS );
+                        break;
+                    case ShapeFile.POINTZ:
+                        s = new ShapePoint( true, false, defaultCRS );
+                        break;
+                    case ShapeFile.POLYLINE:
+                        s = new ShapePolyline( false, false, defaultCRS );
+                        break;
+                    case ShapeFile.POLYLINEM:
+                        s = new ShapePolyline( false, true, defaultCRS );
+                        break;
+                    case ShapeFile.POLYLINEZ:
+                        s = new ShapePolyline( true, false, defaultCRS );
+                        break;
+                    case ShapeFile.POLYGON:
+                        s = new ShapePolygon( false, false, defaultCRS );
+                        break;
+                    case ShapeFile.POLYGONM:
+                        s = new ShapePolygon( false, true, defaultCRS );
+                        break;
+                    case ShapeFile.POLYGONZ:
+                        s = new ShapePolygon( true, false, defaultCRS );
+                        break;
+                    case ShapeFile.MULTIPOINT:
+                        s = new ShapeMultiPoint( false, false, defaultCRS );
+                        break;
+                    case ShapeFile.MULTIPOINTM:
+                        s = new ShapeMultiPoint( false, true, defaultCRS );
+                        break;
+                    case ShapeFile.MULTIPOINTZ:
+                        s = new ShapeMultiPoint( true, false, defaultCRS );
+                        break;
+                    case ShapeFile.MULTIPATCH:
+                        s = new ShapeMultiPatch( len, defaultCRS );
+                        break;
+                    }
+
+                    s.read( bytes, 0 );
+
+                    return s;
+                } catch ( IOException e ) {
+                    // ignore
+                }
+                return null;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException( "Removing not supported." );
+            }
+        };
     }
 
     /**
@@ -264,34 +356,54 @@ public class ShapeFileReader {
         return new ShapeFile( shapes, envelope, dbf, baseName );
     }
 
+    public Iterator<Feature> iterator()
+                            throws IOException, DBaseException {
+        File mainFile = new File( baseName + ".shp" );
+        BufferedInputStream mainIn = new BufferedInputStream( new FileInputStream( mainFile ) );
+        readHeader( mainIn );
+
+        Iterator<Shape> shapes = iterateShapes( mainIn, true );
+        DBaseFile dbf = new DBaseFile( baseName );
+        ShapeFile shapeFile = new ShapeFile( shapes, envelope, dbf, baseName );
+
+        return shapeFile.iterator();
+    }
+
     /**
      * @return the dbase file
      * @throws IOException
      */
-    public DBaseFile getTables() throws IOException {
+    public DBaseFile getTables()
+                            throws IOException {
         return new DBaseFile( baseName );
     }
-    
+
     /**
      * @return the number of shapes stored in this shape file.
      * @throws IOException
      */
-    public int getShapeCount() throws IOException {
+    public int getShapeCount()
+                            throws IOException {
         File file = new File( baseName + ".shx" );
         BufferedInputStream in = new BufferedInputStream( new FileInputStream( file ) );
         readHeader( in );
-        return (length - 100) / 8;
+        return ( length - 100 ) / 8;
     }
-    
+
     /**
      * @return the type of the shape file's contents.
      * @throws IOException
      */
-    public int getShapeType() throws IOException {
+    public int getShapeType()
+                            throws IOException {
         File file = new File( baseName + ".shx" );
         BufferedInputStream in = new BufferedInputStream( new FileInputStream( file ) );
         readHeader( in );
         return shapeType;
     }
-    
+
+    public ShapeEnvelope getEnvelope() {
+        return envelope;
+    }
+
 }
