@@ -42,16 +42,24 @@
  ---------------------------------------------------------------------------*/
 package org.deegree.tools.srs;
 
+import java.io.File;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.deegree.framework.util.FileUtils;
+import org.deegree.framework.util.Pair;
+import org.deegree.io.shpapi.shape_new.Shape;
+import org.deegree.io.shpapi.shape_new.ShapeEnvelope;
 import org.deegree.io.shpapi.shape_new.ShapeFile;
 import org.deegree.io.shpapi.shape_new.ShapeFileReader;
 import org.deegree.io.shpapi.shape_new.ShapeFileWriter;
 import org.deegree.model.crs.CRSFactory;
 import org.deegree.model.crs.GeoTransformer;
 import org.deegree.model.feature.Feature;
-import org.deegree.model.feature.FeatureCollection;
+import org.deegree.model.spatialschema.GeometryFactory;
+import org.deegree.model.spatialschema.Point;
+import org.jfree.io.IOUtils;
 
 /**
  * Tool to transform shapefiles from one CRS to another.
@@ -66,20 +74,45 @@ public class TransformShapeFile {
     private static void transformShapeFile( String inFile, String inCRS, String outFile, String outCRS )
                             throws Exception {
 
-        ShapeFile shapeFile = new ShapeFileReader( inFile, CRSFactory.create( inCRS ) ).read();
-        FeatureCollection fc = shapeFile.getFeatureCollection();
-
-        GeoTransformer gt = new GeoTransformer( outCRS );
+        ShapeFileReader reader = new ShapeFileReader( inFile, CRSFactory.create( inCRS ) );
+        int cnt = reader.getShapeCount();
+        int type = reader.getShapeType();
+        ShapeEnvelope envelope = reader.getEnvelope();
 
         int i = 0;
         System.out.println( "Transforming:                  " );
-        Iterator<Feature> iter = fc.iterator();
-        int step = (int) Math.floor( 5 * ( fc.size() * 0.01 ) );
+        int step = (int) Math.floor( 5 * ( cnt * 0.01 ) );
         step = Math.max( 1, step );
         int percentage = 0;
+
+        GeoTransformer gt = new GeoTransformer( outCRS );
+
+        Point pt = GeometryFactory.createPoint( envelope.xmin, envelope.ymin, CRSFactory.create( inCRS ) );
+        pt = (Point) gt.transform( pt );
+        envelope.xmin = pt.getX();
+        envelope.ymin = pt.getY();
+        pt = GeometryFactory.createPoint( envelope.xmax, envelope.ymax, CRSFactory.create( inCRS ) );
+        pt = (Point) gt.transform( pt );
+        envelope.xmax = pt.getX();
+        envelope.ymax = pt.getY();
+        if ( outFile.toLowerCase().endsWith( ".shp" ) ) {
+            outFile = outFile.substring( 0, outFile.length() - 4 );
+        }
+        if ( inFile.toLowerCase().endsWith( ".shp" ) ) {
+            inFile = inFile.substring( 0, inFile.length() - 4 );
+        }
+
+        Iterator<Feature> iter = reader.iterator();
+
+        ShapeFileWriter writer = new ShapeFileWriter( outFile );
+        Pair<OutputStream, OutputStream> p = writer.writeHeaders( (int) new File( inFile ).length(), cnt, type,
+                                                                  envelope );
+
         while ( iter.hasNext() ) {
             Feature feature = iter.next();
-            gt.transform( feature );
+            feature = gt.transform( feature );
+            Shape shape = ShapeFile.extractShape( feature );
+            writer.writeShape( p.first, p.second, shape );
             if ( i++ % step == 0 ) {
                 System.out.print( "\r" + ( percentage ) + ( ( ( percentage ) < 10 ) ? "  " : " " ) + "% transformed" );
                 percentage += 5;
@@ -87,10 +120,9 @@ public class TransformShapeFile {
         }
         System.out.println();
 
-        ShapeFile result = new ShapeFile( fc, outFile );
-
-        new ShapeFileWriter( result ).write();
-
+        p.first.close();
+        p.second.close();
+        FileUtils.copy( new File( inFile + ".dbf" ), new File( outFile + ".dbf" ) );
     }
 
     private static void printHelpAndExit() {
