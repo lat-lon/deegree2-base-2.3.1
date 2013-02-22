@@ -49,6 +49,7 @@ import java.io.OutputStream;
 
 import org.deegree.framework.log.ILogger;
 import org.deegree.framework.log.LoggerFactory;
+import org.deegree.framework.util.Pair;
 import org.deegree.io.dbaseapi.DBaseException;
 import org.deegree.model.spatialschema.ByteUtils;
 
@@ -66,11 +67,21 @@ public class ShapeFileWriter {
 
     private static final ILogger LOG = LoggerFactory.getLogger( ShapeFileWriter.class );
 
+    private String name;
+
+    private int offset;
+
+    private int recordNum;
+
     /**
      * @param shapes
      */
     public ShapeFileWriter( ShapeFile shapes ) {
         shapeFile = shapes;
+    }
+
+    public ShapeFileWriter( String name ) {
+        this.name = name;
     }
 
     private void writeHeader( OutputStream out, int length )
@@ -90,6 +101,33 @@ public class ShapeFileWriter {
         ByteUtils.writeLEInt( header, 32, shapeFile.getShapeType() );
 
         ShapeEnvelope envelope = shapeFile.getEnvelope();
+        envelope.write( header, 36 );
+
+        // it shouldn't hurt to write these values as doubles default to 0.0 anyway
+        ByteUtils.writeLEDouble( header, 68, envelope.zmin );
+        ByteUtils.writeLEDouble( header, 76, envelope.zmax );
+        ByteUtils.writeLEDouble( header, 84, envelope.mmin );
+        ByteUtils.writeLEDouble( header, 92, envelope.mmax );
+
+        out.write( header, 0, 100 );
+    }
+
+    private static void writeHeader( OutputStream out, int length, int shapeType, ShapeEnvelope envelope )
+                            throws IOException {
+
+        // what's funny about shapefiles:
+        // 1) in the headers, they use big endian for some values, little endian for others
+        // (the rest of the file is little endian)
+        // 2) Only 4 byte ints and 8 byte doubles are used in the file, however,
+        // the size is measured in 16 bit words...
+
+        byte[] header = new byte[100];
+
+        ByteUtils.writeBEInt( header, 0, ShapeFile.FILETYPE );
+        ByteUtils.writeBEInt( header, 24, length );
+        ByteUtils.writeLEInt( header, 28, ShapeFile.VERSION );
+        ByteUtils.writeLEInt( header, 32, shapeType );
+
         envelope.write( header, 36 );
 
         // it shouldn't hurt to write these values as doubles default to 0.0 anyway
@@ -170,6 +208,39 @@ public class ShapeFileWriter {
         indexOut.close();
 
         shapeFile.writeDBF();
+    }
+
+    public Pair<OutputStream, OutputStream> writeHeaders( int size, int num, int shapeType, ShapeEnvelope envelope )
+                            throws IOException, DBaseException {
+        File mainFile = new File( name + ".shp" );
+        BufferedOutputStream mainOut = new BufferedOutputStream( new FileOutputStream( mainFile ) );
+        writeHeader( mainOut, size / 2, shapeType, envelope );
+
+        File indexFile = new File( name + ".shx" );
+        BufferedOutputStream indexOut = new BufferedOutputStream( new FileOutputStream( indexFile ) );
+        writeHeader( indexOut, ( num * 8 + 100 ) / 2, shapeType, envelope );
+        offset = 100;
+        recordNum = 1;
+        return new Pair<OutputStream, OutputStream>( indexOut, mainOut );
+    }
+
+    public void writeShape( OutputStream indexOut, OutputStream mainOut, Shape shape )
+                            throws IOException {
+        byte[] bytes = new byte[shape.getByteLength() + 8];
+        byte[] indexBytes = new byte[8];
+
+        ByteUtils.writeBEInt( indexBytes, 0, ( 100 + offset ) / 2 );
+        ByteUtils.writeBEInt( indexBytes, 4, shape.getByteLength() / 2 );
+        indexOut.write( indexBytes );
+
+        ByteUtils.writeBEInt( bytes, 0, recordNum++ );
+        offset += 4;
+        ByteUtils.writeBEInt( bytes, 4, shape.getByteLength() / 2 ); // again 16-bit words
+        offset += 4;
+
+        offset = shape.write( bytes, 8 );
+        mainOut.write( bytes );
+
     }
 
 }

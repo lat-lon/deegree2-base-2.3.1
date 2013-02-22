@@ -45,6 +45,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -176,6 +177,8 @@ public class ShapeFile {
 
     private String baseName;
 
+    private Iterator<Shape> shapeIterator;
+
     /**
      * @param shapes
      *            the shapes that this shapefile consists of
@@ -215,6 +218,13 @@ public class ShapeFile {
         }
 
         createDBF( fc );
+    }
+
+    public ShapeFile( Iterator<Shape> shapeIterator, ShapeEnvelope envelope, DBaseFile dbf, String baseName ) {
+        this.shapeIterator = shapeIterator;
+        this.envelope = envelope;
+        this.dbf = dbf;
+        this.baseName = baseName;
     }
 
     // this adds the metadata to the dbf
@@ -283,7 +293,7 @@ public class ShapeFile {
         }
     }
 
-    private ArrayList<Curve> getAsCurves( Surface s )
+    public static ArrayList<Curve> getAsCurves( Surface s )
                             throws GeometryException {
         ArrayList<Curve> curves = new ArrayList<Curve>( 10 );
 
@@ -292,7 +302,7 @@ public class ShapeFile {
         return curves;
     }
 
-    private void addAllCurves( Surface s, List<Curve> curves )
+    public static void addAllCurves( Surface s, List<Curve> curves )
                             throws GeometryException {
         // add exterior ring first
         CurveSegment cs = s.getSurfaceBoundary().getExteriorRing().getAsCurveSegment();
@@ -310,7 +320,7 @@ public class ShapeFile {
     }
 
     // currently just the first geometry is extracted, the others are ignored
-    private Shape extractShape( Feature f )
+    public static Shape extractShape( Feature f )
                             throws GeometryException {
         Geometry g = f.getDefaultGeometryPropertyValue();
 
@@ -508,6 +518,54 @@ public class ShapeFile {
         LOG.logInfo( i + " shapes processed in total." );
 
         return fc;
+    }
+
+    public Iterator<Feature> iterator()
+                            throws DBaseException {
+        final class Counter {
+            int cnt = 1;
+        }
+        final Counter counter = new Counter();
+
+        return new Iterator<Feature>() {
+            @Override
+            public boolean hasNext() {
+                try {
+                    return ( counter.cnt - 1 ) < dbf.getRecordNum();
+                } catch ( DBaseException e ) {
+                    // ignore
+                }
+                return false;
+            }
+
+            @Override
+            public Feature next() {
+                try {
+                    Feature f = dbf.getFRow( counter.cnt++ );
+                    Shape s = shapeIterator.next();
+
+                    Geometry geo = s.getGeometry();
+
+                    GeometryPropertyType[] geoPTs = f.getFeatureType().getGeometryProperties();
+                    for ( GeometryPropertyType pt : geoPTs ) {
+                        FeatureProperty[] geoProp = f.getProperties( pt.getName() );
+                        for ( int j = 0; j < geoProp.length; j++ ) {
+                            geoProp[j].setValue( geo );
+                        }
+                    }
+
+                    return f;
+                } catch ( DBaseException e ) {
+                    // ignore
+                }
+                return null;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException( "Removing not supported." );
+            }
+        };
     }
 
     /**
