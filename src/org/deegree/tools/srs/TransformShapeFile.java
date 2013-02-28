@@ -55,7 +55,9 @@ import org.deegree.io.shpapi.shape_new.ShapeFile;
 import org.deegree.io.shpapi.shape_new.ShapeFileReader;
 import org.deegree.io.shpapi.shape_new.ShapeFileWriter;
 import org.deegree.model.crs.CRSFactory;
+import org.deegree.model.crs.CRSTransformationException;
 import org.deegree.model.crs.GeoTransformer;
+import org.deegree.model.crs.UnknownCRSException;
 import org.deegree.model.feature.Feature;
 import org.deegree.model.spatialschema.GeometryFactory;
 import org.deegree.model.spatialschema.Point;
@@ -67,108 +69,171 @@ import org.jfree.io.IOUtils;
  * @author <a href="mailto:tonnhofer@lat-lon.de">Oliver Tonnhofer</a>
  * @author last edited by: $Author: rbezema $
  * 
- * @version $Revision: 14987 $, $Date: 2008-11-20 17:06:18 +0100 (Do, 20. Nov 2008) $
+ * @version $Revision: 14987 $, $Date: 2008-11-20 17:06:18 +0100 (Do, 20. Nov
+ *          2008) $
  */
 public class TransformShapeFile {
 
-    private static void transformShapeFile( String inFile, String inCRS, String outFile, String outCRS )
-                            throws Exception {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 
-        ShapeFileReader reader = new ShapeFileReader( inFile, CRSFactory.create( inCRS ) );
-        int cnt = reader.getShapeCount();
-        int type = reader.getShapeType();
-        ShapeEnvelope envelope = reader.getEnvelope();
+		if (args.length % 2 != 0)
+			printHelpAndExit();
 
-        int i = 0;
-        System.out.println( "Transforming:                  " );
-        int step = (int) Math.floor( 5 * ( cnt * 0.01 ) );
-        step = Math.max( 1, step );
-        int percentage = 0;
+		Properties map = new Properties();
+		for (int i = 0; i < args.length; i += 2) {
+			map.put(args[i], args[i + 1]);
+		}
 
-        GeoTransformer gt = new GeoTransformer( outCRS );
+		if ((String) map.get("-transformId") != null) {
+			handleNtv2Option(map);
+		} else {
+			handleCrsOption(map);
+		}
 
-        Point pt = GeometryFactory.createPoint( envelope.xmin, envelope.ymin, CRSFactory.create( inCRS ) );
-        pt = (Point) gt.transform( pt );
-        envelope.xmin = pt.getX();
-        envelope.ymin = pt.getY();
-        pt = GeometryFactory.createPoint( envelope.xmax, envelope.ymax, CRSFactory.create( inCRS ) );
-        pt = (Point) gt.transform( pt );
-        envelope.xmax = pt.getX();
-        envelope.ymax = pt.getY();
-        if ( outFile.toLowerCase().endsWith( ".shp" ) ) {
-            outFile = outFile.substring( 0, outFile.length() - 4 );
-        }
-        if ( inFile.toLowerCase().endsWith( ".shp" ) ) {
-            inFile = inFile.substring( 0, inFile.length() - 4 );
-        }
+	}
 
-        Iterator<Feature> iter = reader.iterator();
+	private static void printHelpAndExit() {
+		System.out
+				.println("Usage: java [...] org.deegree.tools.srs.TransformShapeFile ");
+		System.out
+				.println("                  -inFile shapeBasename -inCRS crs ");
+		System.out
+				.println("                  [-outFile shapeBasename] -outCRS crs");
+		System.exit(1);
+	}
 
-        ShapeFileWriter writer = new ShapeFileWriter( outFile );
-        Pair<OutputStream, OutputStream> p = writer.writeHeaders( (int) new File( inFile ).length(), cnt, type,
-                                                                  envelope );
+	private static void handleNtv2Option(final Properties map) {
+		String transformId = (String) map.get("-transformId");
+		if (transformId == null) {
+			printHelpAndExit();
+		}
 
-        while ( iter.hasNext() ) {
-            Feature feature = iter.next();
-            feature = gt.transform( feature );
-            Shape shape = ShapeFile.extractShape( feature );
-            writer.writeShape( p.first, p.second, shape );
-            if ( i++ % step == 0 ) {
-                System.out.print( "\r" + ( percentage ) + ( ( ( percentage ) < 10 ) ? "  " : " " ) + "% transformed" );
-                percentage += 5;
-            }
-        }
-        System.out.println();
+		String inFilename = determineInFileName(map);
+		String outFilename = determineOutFileName(map, inFilename, transformId);
 
-        p.first.close();
-        p.second.close();
-        FileUtils.copy( new File( inFile + ".dbf" ), new File( outFile + ".dbf" ) );
-    }
+		try {
+			transformShapeFileWithNtv2(transformId, inFilename, outFilename);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getLocalizedMessage());
+			System.exit(2);
+		}
+	}
 
-    private static void printHelpAndExit() {
-        System.out.println( "Usage: java [...] org.deegree.tools.srs.TransformShapeFile " );
-        System.out.println( "                  -inFile shapeBasename -inCRS crs " );
-        System.out.println( "                  [-outFile shapeBasename] -outCRS crs" );
-        System.exit( 1 );
-    }
+	private static void handleCrsOption(final Properties map) {
+		String outCRS = (String) map.get("-outCRS");
+		if (outCRS == null)
+			printHelpAndExit();
 
-    /**
-     * @param args
-     */
-    public static void main( String[] args ) {
+		String inCRS = (String) map.get("-inCRS");
+		if (inCRS == null)
+			printHelpAndExit();
 
-        if ( args.length % 2 != 0 )
-            printHelpAndExit();
+		String inFilename = determineInFileName(map);
+		String outFilename = determineOutFileName(map, inFilename, outCRS);
 
-        Properties map = new Properties();
-        for ( int i = 0; i < args.length; i += 2 ) {
-            map.put( args[i], args[i + 1] );
-        }
+		try {
+			transformShapeFile(inFilename, inCRS, outFilename, outCRS);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getLocalizedMessage());
+			System.exit(2);
+		}
+	}
 
-        String outCRS = (String) map.get( "-outCRS" );
-        if ( outCRS == null )
-            printHelpAndExit();
+	private static String determineInFileName(final Properties map) {
+		String inFilename = (String) map.get("-inFile");
+		if (inFilename == null)
+			printHelpAndExit();
+		return inFilename;
+	}
 
-        String inCRS = (String) map.get( "-inCRS" );
-        if ( inCRS == null )
-            printHelpAndExit();
+	private static String determineOutFileName(final Properties map,
+			String inFilename, String postfix) {
+		String outFilename = (String) map.get("-outFile");
+		if (outFilename == null) {
+			outFilename = inFilename + "." + postfix;
+		}
+		return outFilename;
+	}
+	
+	private static void transformShapeFile(String inFile, String inCRS,
+			String outFile, String outCRS) throws Exception {
 
-        String inFilename = (String) map.get( "-inFile" );
-        if ( inFilename == null )
-            printHelpAndExit();
+		final ShapeFileReader reader = new ShapeFileReader(inFile,
+				CRSFactory.create(inCRS));
+		final int type = reader.getShapeType();
 
-        String outFilename = (String) map.get( "-outFile" );
-        if ( outFilename == null ) {
-            outFilename = inFilename + "." + outCRS;
-        }
+		System.out.println("Transforming:                  ");
 
-        try {
-            transformShapeFile( inFilename, inCRS, outFilename, outCRS );
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            System.out.println( e.getLocalizedMessage() );
-            System.exit( 2 );
-        }
-    }
+		int cnt = reader.getShapeCount();
+		int step = (int) Math.floor(5 * (cnt * 0.01));
+		step = Math.max(1, step);
 
+		final GeoTransformer gt = new GeoTransformer(outCRS);
+		final ShapeEnvelope envelope = reader.getEnvelope();
+
+		determineEnvelope(inCRS, gt, envelope);
+
+		outFile = cutShpPostfix(outFile);
+		inFile = cutShpPostfix(inFile);
+
+		ShapeFileWriter writer = new ShapeFileWriter(outFile);
+		Pair<OutputStream, OutputStream> streamPair = writer.writeHeaders(
+				(int) new File(inFile).length(), cnt, type, envelope);
+
+		int i = 0;
+		int percentage = 0;
+		Iterator<Feature> iter = reader.iterator();
+		while (iter.hasNext()) {
+			Feature feature = iter.next();
+			feature = gt.transform(feature);
+			Shape shape = ShapeFile.extractShape(feature);
+			writer.writeShape(streamPair.first, streamPair.second, shape);
+			if (i++ % step == 0) {
+				System.out.print("\r" + (percentage)
+						+ (((percentage) < 10) ? "  " : " ") + "% transformed");
+				percentage += 5;
+			}
+		}
+		System.out.println();
+
+		streamPair.first.close();
+		streamPair.second.close();
+		FileUtils.copy(new File(inFile + ".dbf"), new File(outFile + ".dbf"));
+	}
+
+	private static String cutShpPostfix(String outFile) {
+		if (outFile.toLowerCase().endsWith(".shp")) {
+			outFile = outFile.substring(0, outFile.length() - 4);
+		}
+		return outFile;
+	}
+
+	private static void determineEnvelope(String inCRS,
+			final GeoTransformer gt, final ShapeEnvelope envelope)
+			throws UnknownCRSException, CRSTransformationException {
+		final Point ptMin = GeometryFactory.createPoint(envelope.xmin,
+				envelope.ymin, CRSFactory.create(inCRS));
+		final Point ptMinTransformed = (Point) gt.transform(ptMin);
+		envelope.xmin = ptMinTransformed.getX();
+		envelope.ymin = ptMinTransformed.getY();
+
+		final Point ptMax = GeometryFactory.createPoint(envelope.xmax,
+				envelope.ymax, CRSFactory.create(inCRS));
+		final Point ptMaxTransformed = (Point) gt.transform(ptMax);
+		envelope.xmax = ptMaxTransformed.getX();
+		envelope.ymax = ptMaxTransformed.getY();
+	}
+
+	private static void transformShapeFileWithNtv2(String ntv2Id,
+			String inFile, String outFile) throws Exception {
+		System.out.println("Attemting to do a ntv2 transformation with id: "
+				+ ntv2Id);
+		throw new UnsupportedOperationException("Not yet implemented");
+		// TODO
+	}
 }
