@@ -229,16 +229,14 @@ public class ShapeFileWriter {
         byte[] bytes = new byte[shape.getByteLength() + 8];
         byte[] indexBytes = new byte[8];
 
-        ByteUtils.writeBEInt( indexBytes, 0, ( 100 + offset ) / 2 );
+        ByteUtils.writeBEInt( indexBytes, 0, offset / 2 );
         ByteUtils.writeBEInt( indexBytes, 4, shape.getByteLength() / 2 );
         indexOut.write( indexBytes );
 
         ByteUtils.writeBEInt( bytes, 0, recordNum++ );
-        offset += 4;
         ByteUtils.writeBEInt( bytes, 4, shape.getByteLength() / 2 ); // again 16-bit words
-        offset += 4;
 
-        offset = shape.write( bytes, 8 );
+        offset += shape.write( bytes, 8 );
         mainOut.write( bytes );
 
     }
