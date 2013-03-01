@@ -61,7 +61,6 @@ import org.deegree.model.crs.UnknownCRSException;
 import org.deegree.model.feature.Feature;
 import org.deegree.model.spatialschema.GeometryFactory;
 import org.deegree.model.spatialschema.Point;
-import org.jfree.io.IOUtils;
 
 /**
  * Tool to transform shapefiles from one CRS to another.

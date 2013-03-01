@@ -49,6 +49,8 @@ import javax.vecmath.Point3d;
 
 import org.deegree.crs.Identifiable;
 import org.deegree.crs.coordinatesystems.CoordinateSystem;
+import org.deegree.crs.exceptions.TransformationException;
+import org.deegree.crs.utilities.Matrix;
 
 /**
  * 
@@ -347,8 +349,8 @@ public class MatrixTransform extends CRSTransformation {
      * 
      * <p>
      * For example, a square matrix of size 4&times;4. Is a three-dimensional transformation for incoming and outgoing
-     * coordinates. The transformed points <code>(x',y',z')</code> are computed as below (note that this computation
-     * is similar to {@link PerspectiveTransform}):
+     * coordinates. The transformed points <code>(x',y',z')</code> are computed as below (note that this computation is
+     * similar to {@link PerspectiveTransform}):
      * 
      * <blockquote> <code>
      * <pre>
@@ -476,6 +478,36 @@ public class MatrixTransform extends CRSTransformation {
     @Override
     public String getImplementationName() {
         return transformationName;
+    }
+
+    /**
+     * Creates a Matrix transform from a matrix.
+     * 
+     * @param sourceCRS
+     *            used as the CRS for transforming ordinates on the matrix
+     * @param targetCRS
+     *            used as the result CRS after transforming ordinates on the matrix
+     * @param matrix
+     *            The matrix used to define the affine transform.
+     * @return A {@link MatrixTransform} mapping incoming ordinates given in the sourceCRS to the targetCRS.
+     * @throws TransformationException
+     *             if the matrix is not affine.
+     * 
+     */
+    public static MatrixTransform createMatrixTransform( CoordinateSystem sourceCRS, CoordinateSystem targetCRS,
+                                                         final Matrix matrix )
+                            throws TransformationException {
+        if ( matrix == null ) {
+            return null;
+        }
+        if ( matrix.isAffine() ) {// Affine transform are square.
+            if ( matrix.getNumRow() == 3 && matrix.getNumCol() == 3 && !matrix.isIdentity() ) {
+                Matrix3d tmp = matrix.toAffineTransform();
+                return new MatrixTransform( sourceCRS, targetCRS, tmp );
+            }
+            return new MatrixTransform( sourceCRS, targetCRS, matrix );
+        }
+        throw new TransformationException( "Given matrix is not affine, cannot continue" );
     }
 
 }
