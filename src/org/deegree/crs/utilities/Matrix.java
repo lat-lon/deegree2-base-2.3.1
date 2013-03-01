@@ -45,6 +45,9 @@ import javax.vecmath.GMatrix;
 import javax.vecmath.Matrix3d;
 
 import org.deegree.crs.components.Axis;
+import org.deegree.crs.coordinatesystems.CoordinateSystem;
+import org.deegree.crs.coordinatesystems.GeographicCRS;
+import org.deegree.crs.exceptions.TransformationException;
 
 /**
  * The <code>Matrix</code> class TODO add documentation here
@@ -73,8 +76,8 @@ public class Matrix extends GMatrix {
     }
 
     /**
-     * Construct a matrix of size <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code>. Elements on the
-     * diagonal <var>j==i</var> are set to 1.
+     * Construct a matrix of size <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code>. Elements on the diagonal
+     * <var>j==i</var> are set to 1.
      * 
      * @param numRow
      * @param numCol
@@ -84,11 +87,10 @@ public class Matrix extends GMatrix {
     }
 
     /**
-     * Constructs a <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code> matrix initialized to the values in
-     * the <code>matrix</code> array. The array values are copied in one row at a time in row major fashion. The array
+     * Constructs a <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code> matrix initialized to the values in the
+     * <code>matrix</code> array. The array values are copied in one row at a time in row major fashion. The array
      * should be exactly <code>numRow*numCol</code> in length. Note that because row and column numbering begins with
-     * zero, <code>row</code> and <code>numCol</code> will be one larger than the maximum possible matrix index
-     * values.
+     * zero, <code>row</code> and <code>numCol</code> will be one larger than the maximum possible matrix index values.
      * 
      * @param numRow
      * @param numCol
@@ -143,12 +145,13 @@ public class Matrix extends GMatrix {
     /**
      * Construct an affine transform changing axis order. The resulting affine transform will convert incoming
      * coordinates into the given destination Axis. For example if source axis are given with (NORTH,WEST) and
-     * destination axis as (EAST,NORTH) assuming the axis use the same units, the resulted matrix will look like:<br/><code>
+     * destination axis as (EAST,NORTH) assuming the axis use the same units, the resulted matrix will look like:<br/>
+     * <code>
      *  &nbsp;0,&nbsp;1,&nbsp;0<br/>
      * -1,&nbsp;0,&nbsp;0<br/>
      *  &nbsp;0,&nbsp;0,&nbsp;1<br/>
-     *  </code>
-     * Axis orientation can be inverted only. Rotating axis (e.g. from NORTH,WEST, to NORTH,DOWN, ) is not supported.
+     *  </code> Axis orientation can be inverted only. Rotating axis (e.g. from NORTH,WEST, to NORTH,DOWN, ) is not
+     * supported.
      * 
      * @param srcAxis
      *            The set of axis orientation for source coordinate system.
@@ -166,8 +169,8 @@ public class Matrix extends GMatrix {
         /*
          * Map source axis to destination axis. If no axis is moved (for example if the user want to transform
          * (NORTH,EAST) to (SOUTH,EAST)), then source and destination index will be equal. If some axis are moved (for
-         * example if the user want to transform (NORTH,EAST) to (EAST,NORTH)), then ordinates at index <code>srcIndex</code>
-         * will have to be moved at index <code>dstIndex</code>.
+         * example if the user want to transform (NORTH,EAST) to (EAST,NORTH)), then ordinates at index
+         * <code>srcIndex</code> will have to be moved at index <code>dstIndex</code>.
          */
         setZero();
         for ( int srcIndex = 0; srcIndex < dimension; srcIndex++ ) {
@@ -251,4 +254,70 @@ public class Matrix extends GMatrix {
             }
         return true;
     }
+
+    /**
+     * @return an affine transform between two geographic coordinate systems. Only units, axis order (e.g. transforming
+     *         from (NORTH,WEST) to (EAST,NORTH)) and prime meridian are taken in account. Other attributes (especially
+     *         the datum) must be checked before invoking this method.
+     * 
+     * @param sourceCRS
+     *            The source coordinate system.
+     * @param targetCRS
+     *            The target coordinate system.
+     * @throws TransformationException
+     *             if some error occurs.
+     */
+    public static Matrix swapAndRotateGeoAxis( final GeographicCRS sourceCRS, final GeographicCRS targetCRS )
+                            throws TransformationException {
+        Matrix matrix = swapAxis( sourceCRS, targetCRS );
+        if ( !sourceCRS.getGeodeticDatum().getPrimeMeridian().equals( targetCRS.getGeodeticDatum().getPrimeMeridian() ) ) {
+            if ( matrix == null ) {
+                matrix = new Matrix( sourceCRS.getDimension() + 1 );
+            }
+            Axis[] targetAxis = targetCRS.getAxis();
+            final int lastMatrixColumn = matrix.getNumCol() - 1;
+            for ( int i = 0; i < targetAxis.length; ++i ) {
+                // Find longitude, and apply a translation if prime meridians are different.
+                final int orientation = targetAxis[i].getOrientation();
+                if ( Axis.AO_WEST == Math.abs( orientation ) ) {
+                    final double sourceLongitude = sourceCRS.getGeodeticDatum().getPrimeMeridian().getLongitudeAsRadian();
+                    final double targetLongitude = targetCRS.getGeodeticDatum().getPrimeMeridian().getLongitudeAsRadian();
+                    if ( Math.abs( sourceLongitude - targetLongitude ) > EPS11 ) {
+                        double translation = targetLongitude - sourceLongitude;
+                        if ( Axis.AO_WEST == orientation ) {
+                            translation = -translation;
+                        }
+                        // add the translation to the matrix translate element of this axis
+                        matrix.setElement( i, lastMatrixColumn, matrix.getElement( i, lastMatrixColumn ) - translation );
+
+                    }
+                }
+            }
+        }
+        return matrix;
+    }
+
+    /**
+     * @return an affine transform between two coordinate systems. Only units and axis order (e.g. transforming from
+     *         (NORTH,WEST) to (EAST,NORTH)) are taken in account. Other attributes (especially the datum) must be
+     *         checked before invoking this method.
+     * 
+     * @param sourceCRS
+     *            The source coordinate system.
+     * @param targetCRS
+     *            The target coordinate system.
+     * @throws TransformationException
+     *             if some error occurs.
+     */
+    public static Matrix swapAxis( final CoordinateSystem sourceCRS, final CoordinateSystem targetCRS )
+                            throws TransformationException {
+        final Matrix matrix;
+        try {
+            matrix = new Matrix( sourceCRS.getAxis(), targetCRS.getAxis() );
+        } catch ( RuntimeException e ) {
+            throw new TransformationException( sourceCRS, targetCRS, e.getMessage() );
+        }
+        return matrix.isIdentity() ? null : matrix;
+    }
+
 }
