@@ -486,7 +486,7 @@ public class TransformationFactory {
                             throws TransformationException {
         final GeodeticDatum sourceDatum = sourceCRS.getGeodeticDatum();
         final GeodeticDatum targetDatum = targetCRS.getGeodeticDatum();
-        if ( ntv2 == true && sourceCRS.getIdentifier().equals( "EPSG:4314" ) && targetCRS.getIdentifier().equals( "EPSG:4258" ) ) {
+        if ( sourceCRS.getIdentifier().equals( "EPSG:4314" ) && targetCRS.getIdentifier().equals( "EPSG:4258" ) ) {
             return new NTv2Transformation( sourceCRS, targetCRS,
                                            new Identifiable( "urn:ogc:def:coordinateOperation:epsg::15948" ),
                                            TransformationFactory.class.getResource( "ntv2/beta2007.gsb" ) );
@@ -500,7 +500,7 @@ public class TransformationFactory {
                       + " to(target): " + targetCRS.getIdentifier() );
         final Ellipsoid sourceEllipsoid = sourceDatum.getEllipsoid();
         final Ellipsoid targetEllipsoid = targetDatum.getEllipsoid();
-        // if a conversion needs to take place
+        // if a conversion needs totake place
         if ( sourceEllipsoid != null
              && !sourceEllipsoid.equals( targetEllipsoid )
              && ( ( sourceDatum.getWGS84Conversion() != null && sourceDatum.getWGS84Conversion().hasValues() ) || ( targetDatum.getWGS84Conversion() != null && targetDatum.getWGS84Conversion().hasValues() ) ) ) {
