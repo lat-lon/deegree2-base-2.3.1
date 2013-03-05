@@ -47,6 +47,8 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.deegree.crs.transformations.Transformation;
+import org.deegree.crs.transformations.TransformationFactory;
 import org.deegree.framework.util.FileUtils;
 import org.deegree.framework.util.Pair;
 import org.deegree.io.shpapi.shape_new.Shape;
@@ -105,16 +107,27 @@ public class TransformShapeFile {
 	}
 
 	private static void handleNtv2Option(final Properties map) {
+		String inCRS = null;
+		String outCRS = null;
+
 		String transformId = (String) map.get("-transformId");
 		if (transformId == null) {
 			printHelpAndExit();
 		}
-
+		
+        // All implemented transformation IDs listed here
+        if ( transformId.equals("1777") ) {
+			inCRS = "EPSG:4314";
+			outCRS = "EPSG:4258";
+        } else {
+        	System.out.println("NTv2 code is invalid. Transformation cannot be processed.");
+        }
+		
 		String inFilename = determineInFileName(map);
 		String outFilename = determineOutFileName(map, inFilename, transformId);
 
 		try {
-			transformShapeFileWithNtv2(transformId, inFilename, outFilename);
+			transformShapeFile(inFilename, inCRS, outFilename, outCRS, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getLocalizedMessage());
@@ -123,19 +136,19 @@ public class TransformShapeFile {
 	}
 
 	private static void handleCrsOption(final Properties map) {
-		String outCRS = (String) map.get("-outCRS");
-		if (outCRS == null)
-			printHelpAndExit();
-
 		String inCRS = (String) map.get("-inCRS");
 		if (inCRS == null)
+			printHelpAndExit();
+		
+		String outCRS = (String) map.get("-outCRS");
+		if (outCRS == null)
 			printHelpAndExit();
 
 		String inFilename = determineInFileName(map);
 		String outFilename = determineOutFileName(map, inFilename, outCRS);
 
 		try {
-			transformShapeFile(inFilename, inCRS, outFilename, outCRS);
+			transformShapeFile(inFilename, inCRS, outFilename, outCRS, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getLocalizedMessage());
@@ -160,7 +173,7 @@ public class TransformShapeFile {
 	}
 	
 	private static void transformShapeFile(String inFile, String inCRS,
-			String outFile, String outCRS) throws Exception {
+			String outFile, String outCRS, boolean ntv2Active) throws Exception {
 
 		final ShapeFileReader reader = new ShapeFileReader(inFile,
 				CRSFactory.create(inCRS));
@@ -172,7 +185,10 @@ public class TransformShapeFile {
 		int step = (int) Math.floor(5 * (cnt * 0.01));
 		step = Math.max(1, step);
 
-		final GeoTransformer gt = new GeoTransformer(outCRS);
+        Transformation trans = TransformationFactory.getInstance().createFromCoordinateSystems( CRSFactory.create( inCRS ).getCRS(),
+																				        		CRSFactory.create( outCRS ).getCRS(),
+																				        		ntv2Active );		
+		final GeoTransformer gt = new GeoTransformer( trans );
 		final ShapeEnvelope envelope = reader.getEnvelope();
 
 		determineEnvelope(inCRS, gt, envelope);
@@ -228,11 +244,4 @@ public class TransformShapeFile {
 		envelope.ymax = ptMaxTransformed.getY();
 	}
 
-	private static void transformShapeFileWithNtv2(String ntv2Id,
-			String inFile, String outFile) throws Exception {
-		System.out.println("Attemting to do a ntv2 transformation with id: "
-				+ ntv2Id);
-		throw new UnsupportedOperationException("Not yet implemented");
-		// TODO
-	}
 }
